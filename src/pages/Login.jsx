@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import logo from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../Config';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://drdo-backend-production.up.railway.app/api/login', {
+      const response = await fetch(`${BASE_URL}/api/drdoone/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password }),
@@ -25,7 +26,6 @@ const Login = () => {
         console.log('Login successful, token:', data.token);
         setError('');
         navigate('/home');
-        
       } else {
         setError(data.error || 'Login failed');
       }
