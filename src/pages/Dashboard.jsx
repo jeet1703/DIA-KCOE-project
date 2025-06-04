@@ -73,7 +73,7 @@ const Dashboard = () => {
       <Navbar />
       <main className="p-8 flex-grow max-w-full overflow-x-auto">
         <h2 className="text-2xl font-semibold mb-4 text-[#02447C]">
-          Submitted DIA-KCOE Project Records (drdoone)
+          Submitted DIA-CoE Project Records (drdoone)
         </h2>
         <table className="w-full border text-sm bg-white shadow table-auto min-w-[1100px]">
           <thead className="bg-[#02447C] text-white">

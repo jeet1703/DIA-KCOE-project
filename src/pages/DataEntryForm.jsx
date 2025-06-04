@@ -59,7 +59,7 @@ const DataEntryForm = () => {
       <Navbar />
       <main className="p-8 max-w-3xl mx-auto flex-grow">
         <h2 className="text-2xl font-semibold mb-6 text-[#02447C]">
-          Enter New DIA-KCOE Project Record (drdoone)
+          Enter New DIA-CoE Project Record
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
