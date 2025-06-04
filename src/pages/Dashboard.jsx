@@ -1,26 +1,35 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import { BASE_URL } from "../Config";
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch(`https://drdo-backend-production.up.railway.app/api/dashboard/`)
+    fetch(`${BASE_URL}/api/dashboard/drdoone/`)
       .then((res) => res.json())
-      .then((data) => setProjects(data))
+      .then((data) => {
+        // add id field to each project (if not already present)
+        const projectsWithId = data.map((proj, index) => ({
+          ...proj,
+          id: index + 1,
+          comments: proj.comments || "",
+        }));
+        setProjects(projectsWithId);
+      })
       .catch((err) => console.error("Failed to fetch projects:", err));
   }, []);
 
   const handleStatusChange = (id, newStatus) => {
     setProjects((prev) =>
-      prev.map((proj) =>
-        proj.id === id ? { ...proj, status: newStatus } : proj
-      )
+      prev.map((proj) => (proj.id === id ? { ...proj, status: newStatus } : proj))
     );
 
     const project = projects.find((p) => p.id === id);
-    fetch(`https://drdo-backend-production.up.railway.app/api/dashboard/update/${project.referenceNo}`, {
+    if (!project) return;
+
+    fetch(`${BASE_URL}/api/dashboard/drdoone/update/${project.referenceNo}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -31,20 +40,18 @@ const Dashboard = () => {
 
   const handleCommentsChange = (id, newComment) => {
     setProjects((prev) =>
-      prev.map((proj) =>
-        proj.id === id ? { ...proj, comments: newComment } : proj
-      )
+      prev.map((proj) => (proj.id === id ? { ...proj, comments: newComment } : proj))
     );
   };
 
   const handleSendComment = (id) => {
     const project = projects.find((p) => p.id === id);
-    if (project.comments.trim() === "") {
+    if (!project || project.comments.trim() === "") {
       alert("Please enter a comment before sending.");
       return;
     }
 
-    fetch(`https://drdo-backend-production.up.railway.app/api/dashboard/update/${project.referenceNo}`, {
+    fetch(`${BASE_URL}/api/dashboard/drdoone/update/${project.referenceNo}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -55,9 +62,7 @@ const Dashboard = () => {
       .then(() => {
         alert(`Comment sent for project "${project.nomenclature}":\n${project.comments}`);
         setProjects((prev) =>
-          prev.map((proj) =>
-            proj.id === id ? { ...proj, comments: "" } : proj
-          )
+          prev.map((proj) => (proj.id === id ? { ...proj, comments: "" } : proj))
         );
       })
       .catch((err) => console.error("Comment update failed:", err));
@@ -68,7 +73,7 @@ const Dashboard = () => {
       <Navbar />
       <main className="p-8 flex-grow max-w-full overflow-x-auto">
         <h2 className="text-2xl font-semibold mb-4 text-[#02447C]">
-          Submitted DIA-KCOE Project Records
+          Submitted DIA-KCOE Project Records (drdoone)
         </h2>
         <table className="w-full border text-sm bg-white shadow table-auto min-w-[1100px]">
           <thead className="bg-[#02447C] text-white">
@@ -88,28 +93,28 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.map((project, index) => (
+            {projects.map((project) => (
               <tr key={project.id} className="hover:bg-blue-50">
-                <td className="border p-2">{index + 1}</td>
+                <td className="border p-2">{project.id}</td>
                 <td className="border p-2">{project.nomenclature}</td>
                 <td className="border p-2">{project.piName}</td>
                 <td className="border p-2">{project.coordinatingScientist}</td>
                 <td className="border p-2">{project.researchVertical}</td>
-                <td className="border p-2">{project.costInLakhs}</td>
+                <td className="border p-2">{project.costInLakhs || project.cost}</td>
                 <td className="border p-2">{project.sanctionedDate}</td>
-                <td className="border p-2">{project.durationPDC}</td>
-                <td className="border p-2">{project.labContactPerson}</td>
+                <td className="border p-2">{project.durationPDC || project.durationAndPDC}</td>
+                <td className="border p-2">{project.labContactPerson || project.labContact}</td>
                 <td className="border p-2">
                   <select
                     value={project.status}
-                    onChange={(e) =>
-                      handleStatusChange(project.id, e.target.value)
-                    }
+                    onChange={(e) => handleStatusChange(project.id, e.target.value)}
                     className="border rounded px-2 py-1 w-full"
                   >
                     <option value="In Process">In Process</option>
                     <option value="Accepted">Accepted</option>
                     <option value="Rejected">Rejected</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
                   </select>
                 </td>
                 <td className="border p-2">
@@ -117,9 +122,7 @@ const Dashboard = () => {
                     <input
                       type="text"
                       value={project.comments}
-                      onChange={(e) =>
-                        handleCommentsChange(project.id, e.target.value)
-                      }
+                      onChange={(e) => handleCommentsChange(project.id, e.target.value)}
                       className="border rounded px-2 py-1 w-full"
                       placeholder="Add comment"
                     />
