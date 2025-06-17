@@ -191,7 +191,7 @@ const Dashboard = () => {
         <table className="w-full border text-sm bg-white shadow table-auto min-w-[1100px]">
           <thead className="bg-[#02447C] text-white">
             <tr>
-              <th className="border p-2">#</th>
+              <th className="border p-2">S.No.</th>
               <th className="border p-2">Nomenclature</th>
               <th className="border p-2">Academia/Institute</th>
               <th className="border p-2">PI Name</th>
